@@ -1,6 +1,6 @@
--- =========================
--- ENTIDADES BASE (modelo sugerido)
--- =========================
+
+-- schema.sql
+-- Modelo de datos para dashboard analítico
 
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
@@ -52,11 +52,6 @@ CREATE TABLE payments (
     paid_amount NUMERIC(10,2) NOT NULL
 );
 
--- =========================
--- ENTIDADES ANALÍTICAS AÑADIDAS
--- =========================
-
--- Historial de costos de productos (para márgenes)
 CREATE TABLE product_costs (
     id SERIAL PRIMARY KEY,
     product_id INT REFERENCES products(id),
@@ -64,16 +59,14 @@ CREATE TABLE product_costs (
     effective_from DATE NOT NULL
 );
 
--- Movimientos de inventario (entrada, salida, ajustes)
 CREATE TABLE inventory_movements (
     id SERIAL PRIMARY KEY,
     product_id INT REFERENCES products(id),
     qty INT NOT NULL,
-    movement_type VARCHAR(20) NOT NULL, -- IN, OUT, ADJUST
+    movement_type VARCHAR(20) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Historial de estados de pedidos
 CREATE TABLE order_status_history (
     id SERIAL PRIMARY KEY,
     order_id INT REFERENCES orders(id),
