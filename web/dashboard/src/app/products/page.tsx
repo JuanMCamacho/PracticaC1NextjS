@@ -23,11 +23,11 @@ export default function ProductsPage() {
         if (!res.ok) throw new Error('Error al obtener datos');
         return res.json();
       })
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
+      .then((response) => {
+        if (!response.success) {
+          setError(response.error?.message || 'Error desconocido');
         } else {
-          setProducts(data);
+          setProducts(response.data);
         }
         setLoading(false);
       })

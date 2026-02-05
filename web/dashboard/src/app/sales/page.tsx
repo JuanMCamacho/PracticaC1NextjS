@@ -19,11 +19,11 @@ export default function SalesPage() {
         if (!res.ok) throw new Error('Error al obtener datos');
         return res.json();
       })
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
+      .then((response) => {
+        if (!response.success) {
+          setError(response.error?.message || 'Error desconocido');
         } else {
-          setData(data);
+          setData(response.data);
         }
         setLoading(false);
       })
@@ -56,60 +56,31 @@ export default function SalesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-[#8B4789]">Dashboard AWOS</h1>
+      <h1 className="text-3xl font-bold text-[#8B4789]">Ventas y Análisis</h1>
 
-      {/* Métricas principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-sm text-gray-600 mb-2">Total Ventas</h3>
-          <p className="text-3xl font-bold text-[#7CB342]">
-            ${data?.metrics.totalSales.toFixed(2) || '0.00'}
-          </p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-sm text-gray-600 mb-2">Total Productos</h3>
-          <p className="text-3xl font-bold text-[#8B4789]">
-            {data?.metrics.totalProducts || 0}
-          </p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-sm text-gray-600 mb-2">Productos Bajo Stock</h3>
-          <p className="text-3xl font-bold text-[#FF6B6B]">
-            {data?.metrics.lowStockProducts || 0}
-          </p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-sm text-gray-600 mb-2">Clientes Activos</h3>
-          <p className="text-3xl font-bold text-[#E84B8A]">
-            {data?.metrics.activeCustomers || 0}
-          </p>
-        </div>
-      </div>
-
-      {/* Top 5 Productos Más Vendidos */}
+      {/* Ventas Diarias */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-[#8B4789] mb-4">Top 5 Productos Más Vendidos</h2>
+        <h2 className="text-xl font-bold text-[#8B4789] mb-4">Ventas Diarias</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead className="bg-[#E84B8A] text-white">
               <tr>
-                <th className="px-6 py-3 text-left">Producto</th>
-                <th className="px-6 py-3 text-left">Categoría</th>
-                <th className="px-6 py-3 text-right">Cantidad Vendida</th>
+                <th className="px-6 py-3 text-left">Fecha</th>
                 <th className="px-6 py-3 text-right">Total Ventas</th>
+                <th className="px-6 py-3 text-right">Órdenes</th>
+                <th className="px-6 py-3 text-right">Ticket Promedio</th>
               </tr>
             </thead>
             <tbody>
-              {data?.topProducts.map((product, index) => (
+              {(data?.salesDaily || []).slice(0, 10).map((sale: any, index: number) => (
                 <tr key={index} className="border-b hover:bg-[#F5E6F1]">
-                  <td className="px-6 py-4">{product.nombre_producto}</td>
-                  <td className="px-6 py-4">{product.categoria}</td>
-                  <td className="px-6 py-4 text-right">{product.cantidad_vendida}</td>
-                  <td className="px-6 py-4 text-right font-semibold text-[#7CB342]">
-                    ${parseFloat(product.total_ventas).toFixed(2)}
+                  <td className="px-6 py-4">{new Date(sale.fecha).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 text-right font-bold text-[#7CB342]">
+                    ${Number(sale.total_ventas).toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 text-right">{sale.total_ordenes}</td>
+                  <td className="px-6 py-4 text-right">
+                    ${Number(sale.ticket_promedio).toFixed(2)}
                   </td>
                 </tr>
               ))}
@@ -118,28 +89,30 @@ export default function SalesPage() {
         </div>
       </div>
 
-      {/* Productos en Riesgo de Inventario */}
+      {/* Valor por Cliente */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-[#8B4789] mb-4">Productos en Riesgo de Inventario</h2>
+        <h2 className="text-xl font-bold text-[#8B4789] mb-4">Top Clientes por Valor</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full">
-            <thead className="bg-[#FF6B6B] text-white">
+            <thead className="bg-[#E84B8A] text-white">
               <tr>
-                <th className="px-6 py-3 text-left">Producto</th>
-                <th className="px-6 py-3 text-left">Categoría</th>
-                <th className="px-6 py-3 text-right">Stock Actual</th>
-                <th className="px-6 py-3 text-right">Punto de Reorden</th>
+                <th className="px-6 py-3 text-left">Cliente</th>
+                <th className="px-6 py-3 text-right">Total Compras</th>
+                <th className="px-6 py-3 text-right">Órdenes</th>
+                <th className="px-6 py-3 text-right">Ticket Promedio</th>
               </tr>
             </thead>
             <tbody>
-              {data?.inventoryRisk.map((product, index) => (
+              {(data?.customerValue || []).slice(0, 10).map((customer: any, index: number) => (
                 <tr key={index} className="border-b hover:bg-[#F5E6F1]">
-                  <td className="px-6 py-4">{product.nombre_producto}</td>
-                  <td className="px-6 py-4">{product.categoria}</td>
-                  <td className="px-6 py-4 text-right font-bold text-[#FF6B6B]">
-                    {product.stock_actual}
+                  <td className="px-6 py-4 font-medium">{customer.cliente}</td>
+                  <td className="px-6 py-4 text-right font-bold text-[#7CB342]">
+                    ${Number(customer.total_compras).toFixed(2)}
                   </td>
-                  <td className="px-6 py-4 text-right">{product.punto_reorden}</td>
+                  <td className="px-6 py-4 text-right">{customer.total_ordenes}</td>
+                  <td className="px-6 py-4 text-right">
+                    ${Number(customer.ticket_promedio).toFixed(2)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -147,21 +120,42 @@ export default function SalesPage() {
         </div>
       </div>
 
-      {/* Métodos de Pago más Usados */}
+      {/* Rentabilidad por Producto */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-[#8B4789] mb-4">Métodos de Pago</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {data?.paymentMethods.map((method, index) => (
-            <div key={index} className="border border-[#E84B8A] rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-[#8B4789]">{method.metodo_pago}</h3>
-              <p className="text-2xl font-bold text-[#7CB342] mt-2">
-                ${parseFloat(method.total_ventas).toFixed(2)}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                {method.total_transacciones} transacciones
-              </p>
-            </div>
-          ))}
+        <h2 className="text-xl font-bold text-[#8B4789] mb-4">Rentabilidad por Producto</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead className="bg-[#7CB342] text-white">
+              <tr>
+                <th className="px-6 py-3 text-left">Producto</th>
+                <th className="px-6 py-3 text-right">Unidades</th>
+                <th className="px-6 py-3 text-right">Ingresos</th>
+                <th className="px-6 py-3 text-right">Costos</th>
+                <th className="px-6 py-3 text-right">Ganancia</th>
+                <th className="px-6 py-3 text-right">Margen %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(data?.profitability || []).map((product: any, index: number) => (
+                <tr key={index} className="border-b hover:bg-[#F5E6F1]">
+                  <td className="px-6 py-4 font-medium">{product.nombre_producto}</td>
+                  <td className="px-6 py-4 text-right">{product.unidades_vendidas}</td>
+                  <td className="px-6 py-4 text-right font-bold text-[#7CB342]">
+                    ${Number(product.ingresos_totales).toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 text-right text-[#FF6B6B]">
+                    ${Number(product.costos_totales).toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 text-right font-bold">
+                    ${Number(product.ganancia_neta).toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    {Number(product.margen_porcentaje).toFixed(1)}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

@@ -20,11 +20,11 @@ export default function InventoryPage() {
         if (!res.ok) throw new Error('Error al obtener datos');
         return res.json();
       })
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
+      .then((response) => {
+        if (!response.success) {
+          setError(response.error?.message || 'Error desconocido');
         } else {
-          setInventory(data);
+          setInventory(response.data);
         }
         setLoading(false);
       })
