@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { successResponse } from '@/lib/api-types';
+import { handleApiError } from '@/lib/api-helpers';
 
+/**
+ * GET /api/dashboard
+ * Obtiene métricas y datos principales del dashboard
+ * @returns {Object} Métricas del dashboard incluyendo ventas, productos top, inventario
+ */
 export async function GET() {
   try {
     // Ventas diarias
@@ -37,17 +44,21 @@ export async function GET() {
       WHERE stock < 10 AND active = true
     `);
 
-    return NextResponse.json({
+    const data = {
       salesDaily: salesDaily.rows,
       topProducts: topProducts.rows,
       inventoryRisk: inventoryRisk.rows,
       paymentMix: paymentMix.rows,
-      todaySales: todaySales.rows[0]?.total || 0,
-      todayOrders: todayOrders.rows[0]?.total || 0,
-      lowStock: lowStock.rows[0]?.total || 0,
-    });
+      todaySales: Number(todaySales.rows[0]?.total || 0),
+      todayOrders: Number(todayOrders.rows[0]?.total || 0),
+      lowStock: Number(lowStock.rows[0]?.total || 0),
+    };
+
+    return NextResponse.json(successResponse(data));
   } catch (error) {
-    console.error('Dashboard API Error:', error);
+    return handleApiError(error);
+  }
+}
     return NextResponse.json(
       { error: 'Error al obtener datos del dashboard' },
       { status: 500 }

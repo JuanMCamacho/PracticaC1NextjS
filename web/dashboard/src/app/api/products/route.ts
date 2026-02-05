@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { successResponse } from '@/lib/api-types';
+import { handleApiError } from '@/lib/api-helpers';
 
+/**
+ * GET /api/products
+ * Obtiene la lista completa de productos con sus categorías y proveedores
+ * @returns {Array} Lista de productos
+ */
 export async function GET() {
   try {
     const result = await query(`
@@ -11,15 +18,12 @@ export async function GET() {
       FROM products p
       LEFT JOIN categories c ON c.id = p.category_id
       LEFT JOIN suppliers s ON s.id = p.supplier_id
+      WHERE p.active = true
       ORDER BY p.name
     `);
 
-    return NextResponse.json(result.rows);
+    return NextResponse.json(successResponse(result.rows));
   } catch (error) {
-    console.error('Products API Error:', error);
-    return NextResponse.json(
-      { error: 'Error al obtener productos' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

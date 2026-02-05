@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { successResponse } from '@/lib/api-types';
+import { handleApiError } from '@/lib/api-helpers';
 
+/**
+ * GET /api/sales
+ * Obtiene datos de ventas incluyendo ventas diarias, valor de clientes y rentabilidad
+ * @returns {Object} Datos de ventas y análisis
+ */
 export async function GET() {
   try {
     // Ventas diarias
@@ -12,16 +19,14 @@ export async function GET() {
     // Rentabilidad por producto
     const profitability = await query('SELECT * FROM vw_product_profitability ORDER BY profit DESC LIMIT 10');
 
-    return NextResponse.json({
+    const data = {
       salesDaily: salesDaily.rows,
       customerValue: customerValue.rows,
       profitability: profitability.rows,
-    });
+    };
+
+    return NextResponse.json(successResponse(data));
   } catch (error) {
-    console.error('Sales API Error:', error);
-    return NextResponse.json(
-      { error: 'Error al obtener datos de ventas' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
