@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: awos_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: awos
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: anona29050XD
+    ports:
+      - "5432:5432"
+    volumes:
+      - awos_db_data:/var/lib/postgresql/data
+      - ./DB:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d awos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  web:
+    build:
+      context: ./web/dashboard
+    container_name: awos_web
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
+      DATABASE_URL: postgresql://postgres:anona29050XD@db:5432/awos
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  awos_db_data:
