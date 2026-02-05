@@ -12,16 +12,25 @@ interface InventoryItem {
 export default function InventoryPage() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/inventory')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Error al obtener datos');
+        return res.json();
+      })
       .then((data) => {
-        setInventory(data);
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setInventory(data);
+        }
         setLoading(false);
       })
       .catch((error) => {
         console.error('Error:', error);
+        setError('No se pudo conectar a la base de datos.');
         setLoading(false);
       });
   }, []);
@@ -34,6 +43,18 @@ export default function InventoryPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold text-[#8B4789]">Inventario</h1>
+        <div className="bg-[#FF6B6B] bg-opacity-10 border-l-4 border-[#FF6B6B] p-6 rounded-lg">
+          <h3 className="text-lg font-bold text-[#FF6B6B] mb-2">Error</h3>
+          <p className="text-gray-700">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   const lowStockItems = inventory.filter((item) => item.stock_actual < 10);
   const mediumStockItems = inventory.filter(
     (item) => item.stock_actual >= 10 && item.stock_actual < 50
@@ -42,7 +63,7 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-[#8B4789]">📋 Inventario</h1>
+      <h1 className="text-3xl font-bold text-[#8B4789]">Inventario</h1>
 
       {/* Resumen */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -130,7 +151,7 @@ export default function InventoryPage() {
       {lowStockItems.length > 0 && (
         <div className="bg-[#FF6B6B] bg-opacity-10 border-l-4 border-[#FF6B6B] p-6 rounded-lg">
           <h3 className="text-lg font-bold text-[#FF6B6B] mb-2">
-            ⚠️ Atención: {lowStockItems.length} productos con stock crítico
+            Atención: {lowStockItems.length} productos con stock crítico
           </h3>
           <p className="text-gray-700">
             Se recomienda reabastecer estos productos lo antes posible.

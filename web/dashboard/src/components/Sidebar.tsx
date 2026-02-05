@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const menuItems = [
-  { href: '/', label: 'Dashboard', icon: '📊' },
-  { href: '/sales', label: 'Ventas', icon: '💰' },
-  { href: '/products', label: 'Productos', icon: '📦' },
-  { href: '/inventory', label: 'Inventario', icon: '📋' },
+  { href: '/', label: 'Dashboard', icon: '' },
+  { href: '/sales', label: 'Ventas', icon: '' },
+  { href: '/products', label: 'Productos', icon: '' },
+  { href: '/inventory', label: 'Inventario', icon: '' },
 ];
 
 export default function Sidebar() {
@@ -28,7 +28,6 @@ export default function Sidebar() {
                   : 'text-white hover:bg-[#d63d75]'
               }`}
             >
-              <span className="text-2xl">{item.icon}</span>
               <span className="font-medium">{item.label}</span>
             </Link>
           );

@@ -15,16 +15,25 @@ interface Product {
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/products')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Error al obtener datos');
+        return res.json();
+      })
       .then((data) => {
-        setProducts(data);
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setProducts(data);
+        }
         setLoading(false);
       })
       .catch((error) => {
         console.error('Error:', error);
+        setError('No se pudo conectar a la base de datos.');
         setLoading(false);
       });
   }, []);
@@ -37,10 +46,22 @@ export default function ProductsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold text-[#8B4789]">Productos</h1>
+        <div className="bg-[#FF6B6B] bg-opacity-10 border-l-4 border-[#FF6B6B] p-6 rounded-lg">
+          <h3 className="text-lg font-bold text-[#FF6B6B] mb-2">Error</h3>
+          <p className="text-gray-700">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-[#8B4789]">📦 Productos</h1>
+        <h1 className="text-3xl font-bold text-[#8B4789]">Productos</h1>
         <div className="text-sm text-gray-600">
           Total: {products.length} productos
         </div>
