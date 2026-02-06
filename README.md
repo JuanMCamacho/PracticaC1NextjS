@@ -2,58 +2,6 @@
 
 Dashboard de reportes SQL con Next.js (TypeScript) + PostgreSQL + Docker.
 
----
-
-## ⚡ Quick Start
-
-### Para ejecutar este proyecto en tu máquina:
-
-**1. Prerrequisitos**
-- Docker Desktop instalado y corriendo
-
-**2. Configuración (2 minutos)**
-
-```bash
-# Clona el repositorio
-git clone <repo-url>
-cd PracticaC1NextJs
-
-# Copia las variables de entorno
-cp .env.example .env
-cp web/dashboard/.env.example web/dashboard/.env
-
-# IMPORTANTE: Edita .env y cambia las contraseñas
-# Abre el archivo .env y cambia:
-# - POSTGRES_PASSWORD=tu_contraseña_segura
-# - APP_PASSWORD=otra_contraseña_segura
-```
-
-**3. Ejecutar**
-
-```bash
-# Levanta todo con Docker
-docker-compose up --build -d
-
-# Verifica que esté corriendo
-docker-compose ps
-```
-
-**4. Acceder**
-- 🌐 Aplicación: http://localhost:3000
-- 🗄️ Base de datos: localhost:5432
-
-**¿Problemas?**
-
-```bash
-# Limpia y vuelve a empezar
-docker-compose down -v
-docker-compose up --build -d
-
-# Ver logs
-docker-compose logs -f
-```
-
----
 
 ## 🔐 Características de Seguridad
 
