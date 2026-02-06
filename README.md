@@ -234,31 +234,10 @@ UPDATE products SET stock = 100;  -- Sin permisos de escritura
 El proyecto usa variables de entorno para una fácil configuración. Hay dos archivos `.env`:
 
 **1. `.env` en la raíz del proyecto** (para Docker Compose)
-```env
-# PostgreSQL Configuration
-POSTGRES_DB=awos
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your_secure_password_here
 
-# App User Credentials
-APP_USER=app_user
-APP_PASSWORD=app_secure_password_2024
-
-# Port Mapping
-POSTGRES_PORT=5432
-WEB_PORT=3000
-
-# API Configuration
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
-```
 
 **2. `web/dashboard/.env`** (para la aplicación Next.js)
 ```env
-DATABASE_URL=postgresql://app_user:app_secure_password_2024@localhost:5432/awos
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
-```
-
-> 📝 **Nota:** Los archivos `.env.example` están incluidos como plantillas. Cópialos y personalízalos según tus necesidades.
 
 ### 🔒 Importante sobre Seguridad
 
