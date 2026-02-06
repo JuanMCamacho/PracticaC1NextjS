@@ -10,6 +10,9 @@ package-lock.json
 .env.local
 .env.*.local
 
+# Keep example files
+!.env.example
+
 # IDEs
 .vscode/
 .idea/

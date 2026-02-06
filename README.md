@@ -2,6 +2,59 @@
 
 Dashboard de reportes SQL con Next.js (TypeScript) + PostgreSQL + Docker.
 
+---
+
+## ⚡ Quick Start
+
+### Para ejecutar este proyecto en tu máquina:
+
+**1. Prerrequisitos**
+- Docker Desktop instalado y corriendo
+
+**2. Configuración (2 minutos)**
+
+```bash
+# Clona el repositorio
+git clone <repo-url>
+cd PracticaC1NextJs
+
+# Copia las variables de entorno
+cp .env.example .env
+cp web/dashboard/.env.example web/dashboard/.env
+
+# IMPORTANTE: Edita .env y cambia las contraseñas
+# Abre el archivo .env y cambia:
+# - POSTGRES_PASSWORD=tu_contraseña_segura
+# - APP_PASSWORD=otra_contraseña_segura
+```
+
+**3. Ejecutar**
+
+```bash
+# Levanta todo con Docker
+docker-compose up --build -d
+
+# Verifica que esté corriendo
+docker-compose ps
+```
+
+**4. Acceder**
+- 🌐 Aplicación: http://localhost:3000
+- 🗄️ Base de datos: localhost:5432
+
+**¿Problemas?**
+
+```bash
+# Limpia y vuelve a empezar
+docker-compose down -v
+docker-compose up --build -d
+
+# Ver logs
+docker-compose logs -f
+```
+
+---
+
 ## 🔐 Características de Seguridad
 
 - **Usuario dedicado `app_user`** con permisos limitados
@@ -47,10 +100,11 @@ Dashboard de reportes SQL con Next.js (TypeScript) + PostgreSQL + Docker.
 
 ### Requisitos Previos
 
-- Docker Desktop instalado y ejecutándose
+- **Docker Desktop** instalado y ejecutándose
+- **Node.js 18+** (solo si vas a desarrollar sin Docker)
 - Git (opcional)
 
-### Pasos de Instalación
+### 🎯 Inicio Rápido (Recomendado)
 
 1. **Clonar el repositorio**
    ```bash
@@ -58,35 +112,137 @@ Dashboard de reportes SQL con Next.js (TypeScript) + PostgreSQL + Docker.
    cd PracticaC1NextJs
    ```
 
-2. **Levantar los contenedores**
+2. **Configurar variables de entorno**
+   
+   Copia los archivos de ejemplo y personalízalos:
+   
+   ```bash
+   # En la raíz del proyecto
+   cp .env.example .env
+   
+   # En el directorio del dashboard
+   cp web/dashboard/.env.example web/dashboard/.env
+   ```
+   
+   **Edita el archivo `.env` en la raíz** y cambia las contraseñas por defecto:
+   ```env
+   POSTGRES_PASSWORD=tu_contraseña_segura_aqui
+   APP_PASSWORD=otra_contraseña_segura_aqui
+   ```
+
+3. **Levantar los contenedores con Docker**
    ```bash
    docker-compose up --build -d
    ```
+   
+   Esto va a:
+   - Crear la base de datos PostgreSQL
+   - Ejecutar todos los scripts SQL automáticamente
+   - Construir y levantar la aplicación Next.js
+   - Configurar el usuario `app_user` con permisos limitados
 
-3. **Verificar que los contenedores estén corriendo**
+4. **Verificar que todo esté corriendo**
    ```bash
    docker-compose ps
    ```
+   
+   Deberías ver:
+   ```
+   awos_db    postgres:16-alpine   Up
+   awos_web   ...                  Up
+   ```
 
-4. **Acceder a la aplicación**
-   - Frontend: http://localhost:3000
-   - Base de datos: localhost:5432
+5. **Acceder a la aplicación**
+   - 🌐 Frontend: http://localhost:3000
+   - 🗄️ Base de datos: localhost:5432
 
-### Comandos Útiles
+### 🛠️ Comandos Útiles
 
 ```bash
-# Ver logs
+# Ver logs en tiempo real
 docker-compose logs -f
 
-# Detener servicios
+# Ver solo logs del web
+docker-compose logs -f web
+
+# Detener servicios (mantiene datos)
 docker-compose down
 
-# Limpiar datos y reiniciar
+# Limpiar TODO y empezar de cero
 docker-compose down -v
 docker-compose up --build -d
 
 # Acceder a la base de datos
 docker exec -it awos_db psql -U postgres -d awos
+
+# Reiniciar solo el servicio web
+docker-compose restart web
+```
+
+### 💻 Desarrollo Local (sin Docker)
+
+Si prefieres desarrollar sin Docker:
+
+1. **Asegúrate de tener PostgreSQL instalado** y corriendo en tu máquina
+
+2. **Crear la base de datos**
+   ```bash
+   psql -U postgres
+   CREATE DATABASE awos;
+   \q
+   ```
+
+3. **Ejecutar los scripts SQL manualmente**
+   ```bash
+   psql -U postgres -d awos -f DB/01_schema.sql
+   psql -U postgres -d awos -f DB/02_seed.sql
+   psql -U postgres -d awos -f DB/03_reports_vw.sql
+   psql -U postgres -d awos -f DB/04_indexes.sql
+   psql -U postgres -d awos -f DB/05_roles.sql
+   ```
+
+4. **Configurar el archivo `.env`** en `web/dashboard/`:
+   ```env
+   DATABASE_URL=postgresql://app_user:app_secure_password_2024@localhost:5432/awos
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+   ```
+
+5. **Instalar dependencias y ejecutar**
+   ```bash
+   cd web/dashboard
+   npm install
+   npm run dev
+   ```
+
+### ⚠️ Solución de Problemas
+
+**Error: Puerto 5432 ya está en uso**
+```bash
+# Cambia el puerto en .env
+POSTGRES_PORT=5433
+```
+
+**Error: Puerto 3000 ya está en uso**
+```bash
+# Cambia el puerto en .env
+WEB_PORT=3001
+```
+
+**La base de datos no se inicializa**
+```bash
+# Limpia los volúmenes y vuelve a crear
+docker-compose down -v
+docker volume prune
+docker-compose up --build -d
+```
+
+**No puedo conectarme a la base de datos**
+```bash
+# Verifica que el contenedor esté corriendo
+docker-compose ps
+
+# Revisa los logs de la base de datos
+docker-compose logs db
 ```
 
 ## 📡 API Endpoints
@@ -172,24 +328,41 @@ UPDATE products SET stock = 100;  -- Sin permisos de escritura
 
 ### Variables de Entorno
 
-**`.env` (para desarrollo local)**
+El proyecto usa variables de entorno para una fácil configuración. Hay dos archivos `.env`:
+
+**1. `.env` en la raíz del proyecto** (para Docker Compose)
+```env
+# PostgreSQL Configuration
+POSTGRES_DB=awos
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_secure_password_here
+
+# App User Credentials
+APP_USER=app_user
+APP_PASSWORD=app_secure_password_2024
+
+# Port Mapping
+POSTGRES_PORT=5432
+WEB_PORT=3000
+
+# API Configuration
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+```
+
+**2. `web/dashboard/.env`** (para la aplicación Next.js)
 ```env
 DATABASE_URL=postgresql://app_user:app_secure_password_2024@localhost:5432/awos
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
 ```
 
-**Docker Compose**
-```yaml
-services:
-  db:
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: anona29050XD
-  
-  web:
-    environment:
-      DATABASE_URL: postgresql://app_user:app_secure_password_2024@db:5432/awos
-```
+> 📝 **Nota:** Los archivos `.env.example` están incluidos como plantillas. Cópialos y personalízalos según tus necesidades.
+
+### 🔒 Importante sobre Seguridad
+
+- ⚠️ **Nunca compartas** tus archivos `.env` con contraseñas reales
+- ⚠️ **Los archivos `.env` están en `.gitignore`** por seguridad
+- ✅ **Usa `.env.example`** para documentar las variables necesarias
+- ✅ **Cambia las contraseñas por defecto** antes de usar en cualquier ambiente
 
 ## 📚 Stack Tecnológico
 
