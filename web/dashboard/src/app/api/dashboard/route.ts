@@ -22,27 +22,14 @@ export async function GET() {
     // Mezcla de pagos
     const paymentMix = await query('SELECT * FROM vw_payment_mix');
     
-    // Total de ventas hoy
-    const todaySales = await query(`
-      SELECT COALESCE(SUM(oi.qty * oi.unit_price), 0) as total
-      FROM orders o
-      JOIN order_items oi ON oi.order_id = o.id
-      WHERE DATE(o.created_at) = CURRENT_DATE AND o.status = 'COMPLETED'
-    `);
+    // Total de ventas hoy (usando vista)
+    const todaySales = await query('SELECT * FROM vw_today_sales');
     
-    // Total de órdenes hoy
-    const todayOrders = await query(`
-      SELECT COUNT(*) as total
-      FROM orders
-      WHERE DATE(created_at) = CURRENT_DATE
-    `);
+    // Total de órdenes hoy (usando vista)
+    const todayOrders = await query('SELECT * FROM vw_today_orders');
     
-    // Productos con bajo stock
-    const lowStock = await query(`
-      SELECT COUNT(*) as total
-      FROM products
-      WHERE stock < 10 AND active = true
-    `);
+    // Productos con bajo stock (usando vista)
+    const lowStock = await query('SELECT * FROM vw_low_stock_count');
 
     const data = {
       salesDaily: salesDaily.rows,
@@ -57,11 +44,5 @@ export async function GET() {
     return NextResponse.json(successResponse(data));
   } catch (error) {
     return handleApiError(error);
-  }
-}
-    return NextResponse.json(
-      { error: 'Error al obtener datos del dashboard' },
-      { status: 500 }
-    );
   }
 }

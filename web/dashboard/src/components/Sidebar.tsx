@@ -8,6 +8,7 @@ const menuItems = [
   { href: '/sales', label: 'Ventas', icon: '' },
   { href: '/products', label: 'Productos', icon: '' },
   { href: '/inventory', label: 'Inventario', icon: '' },
+  { href: '/customers', label: 'Clientes', icon: '' },
 ];
 
 export default function Sidebar() {

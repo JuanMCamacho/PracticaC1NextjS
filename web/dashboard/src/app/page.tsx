@@ -49,7 +49,6 @@ export default function Home() {
   if (error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-[#8B4789]">Dashboard Principal</h1>
         <div className="bg-[#FF6B6B] bg-opacity-10 border-l-4 border-[#FF6B6B] p-6 rounded-lg">
           <h3 className="text-lg font-bold text-[#FF6B6B] mb-2">Error de Conexión</h3>
           <p className="text-gray-700 mb-4">{error}</p>
@@ -61,8 +60,6 @@ export default function Home() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-[#8B4789]">Dashboard Principal</h1>
-
       {/* Métricas principales */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-[#E84B8A]">

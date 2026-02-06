@@ -5,7 +5,6 @@ import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "AWOS Dashboard",
-  description: "Sistema de gestión y análisis",
 };
 
 export default function RootLayout({
