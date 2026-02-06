@@ -113,22 +113,11 @@ docker-compose logs -f
    ```
 
 2. **Configurar variables de entorno**
-   
-   Copia los archivos de ejemplo y personalízalos:
-   
-   ```bash
-   # En la raíz del proyecto
-   cp .env.example .env
-   
+  ``` 
    # En el directorio del dashboard
    cp web/dashboard/.env.example web/dashboard/.env
    ```
    
-   **Edita el archivo `.env` en la raíz** y cambia las contraseñas por defecto:
-   ```env
-   POSTGRES_PASSWORD=tu_contraseña_segura_aqui
-   APP_PASSWORD=otra_contraseña_segura_aqui
-   ```
 
 3. **Levantar los contenedores con Docker**
    ```bash
@@ -179,40 +168,6 @@ docker exec -it awos_db psql -U postgres -d awos
 docker-compose restart web
 ```
 
-### 💻 Desarrollo Local (sin Docker)
-
-Si prefieres desarrollar sin Docker:
-
-1. **Asegúrate de tener PostgreSQL instalado** y corriendo en tu máquina
-
-2. **Crear la base de datos**
-   ```bash
-   psql -U postgres
-   CREATE DATABASE awos;
-   \q
-   ```
-
-3. **Ejecutar los scripts SQL manualmente**
-   ```bash
-   psql -U postgres -d awos -f DB/01_schema.sql
-   psql -U postgres -d awos -f DB/02_seed.sql
-   psql -U postgres -d awos -f DB/03_reports_vw.sql
-   psql -U postgres -d awos -f DB/04_indexes.sql
-   psql -U postgres -d awos -f DB/05_roles.sql
-   ```
-
-4. **Configurar el archivo `.env`** en `web/dashboard/`:
-   ```env
-   DATABASE_URL=postgresql://app_user:app_secure_password_2024@localhost:5432/awos
-   NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
-   ```
-
-5. **Instalar dependencias y ejecutar**
-   ```bash
-   cd web/dashboard
-   npm install
-   npm run dev
-   ```
 
 ### ⚠️ Solución de Problemas
 
